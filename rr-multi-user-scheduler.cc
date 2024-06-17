@@ -61,6 +61,8 @@ bool last_tx_basic = false;
 ns3::Time basic_start = TimeStep(0);
 
 bool bsrp_limit = true;
+bool dl_limit=false;
+int dl_count;
 int bsrp_count = 10;
 
 bool prop_scheduler = false;
@@ -767,6 +769,7 @@ RrMultiUserScheduler::DoInitialize()
 {
     NS_LOG_FUNCTION(this);
     NS_ASSERT(m_apMac);
+    if(bsrp_limit)std::cout<<" BSRP Limit is on\n";
     m_apMac->TraceConnectWithoutContext(
         "AssociatedSta",
         MakeCallback(&RrMultiUserScheduler::NotifyStationAssociated, this));
@@ -838,14 +841,31 @@ RrMultiUserScheduler::SelectTxFormat()
         if (txFormat != DL_MU_TX)
         {
 
-            if(bsrp_limit){
+            if(bsrp_limit){ // bsrp at regular intervals
+
                 bsrp_count--;
                 
-                if(bsrp_count <= 0){
+                if(bsrp_count <= 0){//send bsrp
                     bsrp_count = 10;
-
+                    last_tx_bsrp = true;
+                    bsrp_start = Simulator::Now();
                     return txFormat;
                 }
+
+ 
+                // else{//send basic tf
+                //     TxFormat txFormat = TrySendingBasicTf();
+
+                //         if (txFormat != DL_MU_TX)
+                //         {
+                //             last_tx_basic = true;
+                //             basic_start = Simulator::Now();
+                            
+                //             return txFormat;
+                //         }
+
+
+                // }
 
             }else{
                 last_tx_bsrp = true;
@@ -854,6 +874,7 @@ RrMultiUserScheduler::SelectTxFormat()
             }
         }
     }
+
     else if (m_enableUlOfdma && ((GetLastTxFormat(m_linkId) == DL_MU_TX) ||
                                  (m_trigger.GetType() == TriggerFrameType::BSRP_TRIGGER) || !mpdu))
     {
