@@ -404,7 +404,7 @@ private:
    
   bool m_useCentral26TonesRus {false};
   uint32_t m_ulPsduSize{2000}; // bytes
-  uint16_t m_channelWidth{40}; // channel bandwidth (MHz)
+  uint16_t m_channelWidth{20}; // channel bandwidth (MHz)
   uint8_t m_channelNumber{36};
   WifiPhyBand m_band {WIFI_PHY_BAND_UNSPECIFIED};
   uint16_t m_guardInterval{800}; // GI in nanoseconds
@@ -1011,7 +1011,7 @@ WifiOfdmaExample::GenerateTrafficFlows ()
           // m_flows.push_back (flow);
 
           flow.m_ac = AC_BE;
-          flow.m_l4Proto = Flow::TCP;
+          flow.m_l4Proto = Flow::UDP;
           flow.m_payloadSize = m_frameSize;
           flow.m_stationId = staId;
           flow.m_dataRate = 1 * m_ulFlowDataRate * 1e6;
